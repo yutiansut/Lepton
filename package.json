@@ -91,7 +91,7 @@
     "request-promise": "^4.1.1",
     "twitter-text": "^2.0.2",
     "valid-filename": "^2.0.1",
-    "webpack-cli": "^2.0.12",
+    "webpack-cli": "^3.0.0",
     "winston": "^2.3.0"
   },
   "build": {
