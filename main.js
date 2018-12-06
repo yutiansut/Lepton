@@ -45,6 +45,7 @@ const keyImmersiveMode = 'CommandOrControl+I'
 const keyAboutPage = 'CommandOrControl+,'
 const keyDashboard = 'CommandOrControl+D'
 const keyEditorExit = 'CommandOrControl+Escape'
+const keySyncGists = 'CommandOrControl+R'
 
 function createWindowAndAutoLogin () {
   createWindow(true)
@@ -67,7 +68,8 @@ function createWindow (autoLogin) {
     minHeight: 700,
     // titleBarStyle: 'hidden',
     backgroundColor: '#808080',
-    show: false
+    show: false,
+    icon: path.join(__dirname, '/icon/icon.png')
   })
 
   if (autoLogin) {
@@ -185,6 +187,11 @@ function setUpApplicationMenu () {
         label: 'Submit Gist',
         accelerator: keySubmitGist,
         click: (item, mainWindow) => mainWindow && mainWindow.send('submit-gist')
+      },
+      {
+        label: 'Sync Gist',
+        accelerator: keySyncGists,
+        click: (item, mainWindow) => mainWindow && mainWindow.send('sync-gists')
       },
       {
         label: 'Exit Editor',

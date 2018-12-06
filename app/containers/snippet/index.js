@@ -5,8 +5,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { Panel, Modal, Button, ProgressBar, Collapse } from 'react-bootstrap'
 import { default as GistEditorForm, UPDATE_GIST } from '../gistEditorForm'
-import HighlightJS from 'highlight.js'
-import Markdown from '../../utilities/markdown'
+import CodeArea from '../codeArea'
 import { remote, clipboard, ipcRenderer } from 'electron'
 import Notifier from '../../utilities/notifier'
 import HumanReadableTime from 'human-readable-time'
@@ -24,7 +23,7 @@ import {
   updateGistDeleteModeStatus,
   selectGistTag,
   updateFileExpandStatus,
-  updateGistTags } from '../../actions/index'
+  updateGistTags } from '../../actions'
 
 import {
   getGitHubApi,
@@ -33,7 +32,6 @@ import {
 } from '../../utilities/githubApi'
 
 import './index.scss'
-import '../../utilities/vendor/highlightJS/styles/github-gist.css'
 
 import editIcon from './ei-edit.svg'
 import openInWebIcon from './ei-share.svg'
@@ -46,7 +44,7 @@ const conf = remote.getGlobal('conf')
 const logger = remote.getGlobal('logger')
 
 const kIsExpanded = conf.get('snippet:expanded')
-const kTabLength = ' '.repeat(conf.get('editor:tabSize'))
+const kTabLength = conf.get('editor:tabSize')
 
 class Snippet extends Component {
   componentDidMount () {
@@ -374,67 +372,6 @@ class Snippet extends Component {
     this.refs.rawModalText.select()
   }
 
-  //  Adapt the language name for Highlight.js. For example, 'C#' should be
-  //  expressed as 'cs' to be recognized by Highlight.js.
-  adaptedLanguage (lang) {
-    let language = lang || 'Other'
-
-    switch (language) {
-      case 'Shell': return 'Bash'
-      case 'C#': return 'cs'
-      case 'Objective-C': return 'objectivec'
-      case 'Objective-C++': return 'objectivec'
-      default:
-    }
-    return language
-  }
-
-  adjustTabLength (content) {
-    return content.replace(/[\t]/g, kTabLength)
-  }
-
-  createMarkdownCodeBlock (content) {
-    return `<div class='markdown-section'>${Markdown.render(content)}</div>`
-  }
-
-  createHighlightedCodeBlock (content, language) {
-    let lineNumber = 0
-    const highlightedContent = HighlightJS.highlightAuto(this.adjustTabLength(content), [language]).value
-
-    /*
-      Highlight.js wraps comment blocks inside <span class='hljs-comment'></span>.
-      However, when the multi-line comment block is broken down into diffirent
-      table rows, only the first row, which is appended by the <span> tag, is
-      highlighted. The following code fixes it by appending <span> to each line
-      of the comment block.
-    */
-    const commentPattern = /<span class="hljs-comment">(.|\n)*?<\/span>/g
-    const adaptedHighlightedContent = highlightedContent.replace(commentPattern, data => {
-      return data.replace(/\r?\n/g, () => {
-        // Chromium is smart enough to add the closing </span>
-        return "\n<span class='hljs-comment'>"
-      })
-    })
-
-    const contentTable = adaptedHighlightedContent.split(/\r?\n/).map(lineContent => {
-      return `<tr>
-                <td class='line-number' data-pseudo-content=${++lineNumber}></td>
-                <td>${lineContent}</td>
-              </tr>`
-    }).join('')
-
-    return `<pre><code><table class='code-table'>${contentTable}</table></code></pre>`
-  }
-
-  createMarkup (content, lang) {
-    const language = this.adaptedLanguage(lang)
-    const htmlContent = language === 'Markdown'
-      ? this.createMarkdownCodeBlock(content)
-      : this.createHighlightedCodeBlock(content, language)
-
-    return { __html: htmlContent }
-  }
-
   handleCopyRawLinkClicked (url) {
     clipboard.writeText(url)
     Notifier('Copied', 'The raw file link has been copied to the clipboard.')
@@ -551,7 +488,11 @@ class Snippet extends Component {
       for (const key in fileList) {
         const gistFile = fileList[key]
 
-        if (gistFile.filename === '.leptonrc') gistFile.language = 'json'
+        const filename = gistFile.filename
+        if (filename === '.leptonrc') gistFile.language = 'json'
+        else if (filename.endsWith('.sol') || filename.endsWith('.solidity')) {
+          gistFile.language = 'solidity'
+        }
 
         fileArray.push(Object.assign({
           filename: gistFile.filename,
@@ -598,9 +539,9 @@ class Snippet extends Component {
               </div>
             </div>
             <Collapse in={ isExpanded }>
-              <div
-                className='code-area'
-                dangerouslySetInnerHTML={ this.createMarkup(gistFile.content, gistFile.language) }/>
+              <div className='collapsable-code-area'>
+                <CodeArea content={gistFile.content} language={gistFile.language} kTabLength={kTabLength}/>
+              </div>
             </Collapse>
           </div>
         )

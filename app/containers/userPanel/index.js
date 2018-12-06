@@ -47,6 +47,7 @@ if (conf.get('enterprise:enable')) {
 }
 
 const kIsPrivate = conf.get('snippet:newSnippetPrivate')
+const hideProfilePhoto = conf.get('userPanel:hideProfilePhoto')
 
 class UserPanel extends Component {
   componentDidMount () {
@@ -55,6 +56,9 @@ class UserPanel extends Component {
     })
     ipcRenderer.on('exit-editor', () => {
       this.closeGistEditorModal()
+    })
+    ipcRenderer.on('sync-gists', () => {
+      this.handleSyncClicked()
     })
   }
 
@@ -263,11 +267,12 @@ class UserPanel extends Component {
       image: null
     })
     removeAccessToken()
+    remote.getCurrentWindow().setTitle('Lepton') // update the app title
   }
 
   renderProfile () {
     const { profile, activeStatus } = this.props.userSession
-    if (!profile || activeStatus === 'INACTIVE') {
+    if (hideProfilePhoto || !profile || activeStatus === 'INACTIVE') {
       return
     }
 
