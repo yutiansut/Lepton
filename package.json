@@ -57,7 +57,7 @@
     "webpack-node-externals": "^1.6.0"
   },
   "dependencies": {
-    "autolinker": "^1.4.0",
+    "autolinker": "^3.14.0",
     "bluebird": "^3.4.7",
     "chart.js": "^1.1.1",
     "codemirror": "^5.28.0",
