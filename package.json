@@ -14,7 +14,9 @@
     "pack": "webpack --mode production",
     "test": "webpack --display-modules --mode development",
     "dist": "build",
-    "release": "build"
+    "release": "build",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -95,7 +97,8 @@
     "twitter-text": "^2.0.2",
     "valid-filename": "^2.0.1",
     "webpack-cli": "^2.0.12",
-    "winston": "^2.3.0"
+    "winston": "^2.3.0",
+    "snyk": "^1.316.1"
   },
   "build": {
     "appId": "com.cosmox.lepton",
@@ -140,5 +143,6 @@
         "github"
       ]
     }
-  }
+  },
+  "snyk": true
 }
