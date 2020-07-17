@@ -90,7 +90,7 @@
     "redux": "^3.7.2",
     "redux-form": "^7.0.0",
     "redux-thunk": "^2.1.0",
-    "request": "^2.79.0",
+    "request": "^2.88.0",
     "request-promise": "^4.1.1",
     "twitter-text": "^2.0.2",
     "valid-filename": "^2.0.1",
