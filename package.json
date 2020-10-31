@@ -60,7 +60,7 @@
     "autolinker": "^1.4.0",
     "bluebird": "^3.4.7",
     "chart.js": "^1.1.1",
-    "codemirror": "^5.28.0",
+    "codemirror": "^5.58.2",
     "electron-context-menu": "^0.9.0",
     "electron-is-dev": "^0.3.0",
     "electron-json-storage-sync": "^1.1.0",
